@@ -2,44 +2,23 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.Status;
 import com.example.demo.dto.ToDo;
+import com.example.demo.service.TodoService;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 public class TodoController {
 
-    private final List<ToDo> todoList ;
+    private final TodoService todoService;
 
-    public TodoController(List<ToDo> todoList){
-        this.todoList = new ArrayList<>(todoList);
+    public TodoController(TodoService todoService) {
+        this.todoService = todoService;
     }
 
     @PostMapping("/save")
     public String save(@RequestBody ToDo toDo){
-        try {
-            if(toDo.getTitle().isBlank()){
-                String title = toDo.getTitle();
-            }
-        } catch (Exception e) {
-            return "Invalid Entry. Please provide title." + e.getMessage();
-        }
-        try{
-            for(ToDo existing: todoList){
-                if(existing.getTitle().equalsIgnoreCase(toDo.getTitle())){
-                    return "Title already exists";
-                }
-            }
-                if(false) {
-                    return "Incomplete Information";
-                }
-                    todoList.add(toDo);
-                    return "Saved Succesfully";
-        }
-        catch(Exception e) {
-            return "Failed due to error, " + e.getMessage();
-        }
+        return todoService.save(toDo);
     }
 
     @GetMapping("/title")
