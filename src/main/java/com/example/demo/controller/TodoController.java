@@ -42,14 +42,6 @@ public class TodoController {
         }
     }
 
-    private boolean ifIncomplete(ToDo toDo) {
-        return toDo.getTitle().isBlank()
-                || toDo.getDescription().isBlank()
-                || toDo.getTitle() == null
-                || toDo.getDescription() == null
-                || toDo.getStatus() == null;
-    }
-
     @GetMapping("/title")
     public ToDo getTodoFromTitle(@RequestParam String title){
         for(ToDo todo: todoList){
