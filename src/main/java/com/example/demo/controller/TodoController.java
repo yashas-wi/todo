@@ -1,8 +1,8 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.Status;
 import com.example.demo.dto.ToDo;
 import com.example.demo.service.TodoService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,6 +11,7 @@ import java.util.List;
 public class TodoController {
 
     private final TodoService todoService;
+    private List<ToDo> todoList;
 
     public TodoController(TodoService todoService) {
         this.todoService = todoService;
@@ -23,54 +24,32 @@ public class TodoController {
 
     @GetMapping("/title")
     public ToDo getTodoFromTitle(@RequestParam String title){
-        for(ToDo todo: todoList){
-            if(todo.getTitle().equalsIgnoreCase(title)) return todo;
-        }
-        return null;
+        return todoService.title(title);
     }
 
     @PutMapping("/updateStatus")
-    public String update(@RequestParam String status ,@RequestParam String title ){
-        Status currentStatus = switch (status) {
-            case "pending" -> Status.PENDING;
-            case "completed" -> Status.COMPLETED;
-            case "in progress" -> Status.IN_PROGRESS;
-            default -> throw new IllegalArgumentException("Invalid status");
-        };
-        for(ToDo todo: todoList){
-            if(todo.getTitle().equalsIgnoreCase(title)){
-                todo.setStatus(currentStatus);
-                return "Updated Successfully";
-            }
+    public ResponseEntity<String> updateStatus(@RequestParam String title, @RequestParam String status) {
+        try{
+            todoService.updateStatus(title, status);
+            return ResponseEntity.ok().body("Status updated");
+        } catch(IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-        return "Title not found";
     }
 
     @GetMapping("/lists")
     public List<ToDo> lists(){
-        return todoList;
+        return todoService.lists();
     }
 
-    @GetMapping("/updateDescription")
+
+    @PutMapping("/updateDescription")
     public String updateD(@RequestParam String description , @RequestParam String title){
-        for(ToDo todo : todoList){
-            if(todo.getTitle().equalsIgnoreCase(title)){
-                todo.setDescription(description);
-                todo.setUpdated();
-                return "Updated Successfully";
-            }
-        }
-        return "Title not found";
+        return todoService.updateDescription(title,description);
     }
 
     @GetMapping("/delete")
-    public String delete(@RequestParam String title){
-        for(ToDo todo: todoList){
-            if(todo.getTitle().equalsIgnoreCase(title)){
-                todoList.remove(todo);
-                return "Todo removed";
-            }
-        }
-        return "Title not found";
+    public String delete(@RequestParam String title) {
+        return todoService.delete(title);
     }
 }
