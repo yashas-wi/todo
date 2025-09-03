@@ -74,7 +74,7 @@ public class TodoService {
                 return "Updated Successfully";
             }
         }
-        return "Title not found";
+        throw new IllegalArgumentException("Title not found");
     }
 
     public  String delete(String title){
